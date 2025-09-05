@@ -1,0 +1,72 @@
+CREATE TABLE INGENIERO
+(
+    RUT VARCHAR(12) PRIMARY KEY,
+
+    nombre VARCHAR(60) NOT NULL,
+    email VARCHAR(35) NOT NULL
+);
+
+CREATE TABLE USUARIO
+(
+    RUT VARCHAR(12) PRIMARY KEY,
+
+    nombUsuario VARCHAR(35) NOT NULL,
+    email VARCHAR(35) NOT NULL
+);
+
+
+
+CREATE TABLE TOPICO
+(
+    idTopico INT PRIMARY KEY,
+    nomTopico VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE SOLICITUD
+(
+    idSolicitud INT PRIMARY KEY,
+    idTopicoSolicitud INT NOT NULL,
+    estado VARCHAR(10)
+);
+
+CREATE TABLE FUNCIONALIDAD
+(
+    titulo VARCHAR(60) NOT NULL,
+    ambiente VARCHAR(5),
+    resumen VARCHAR(150) NOT NULL
+) INHERITS (SOLICITUD);
+
+CREATE TABLE GESTION_ERROR
+(
+    idSolicitud INT PRIMARY KEY,
+    idTopicoSolicitud INT NOT NULL,
+    estado VARCHAR(10),
+    titulo VARCHAR(60) NOT NULL,
+    fechaPublicacion DATE NOT NULL,
+    descripcion VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE DETALLE_SOLICITUD
+(
+    rutUsuario VARCHAR(12),
+    idSolicitud INT,
+    FOREIGN KEY (rutUsuario) REFERENCES USUARIO(RUT),
+    FOREIGN KEY (idSolicitud) REFERENCES SOLICITUD(idSolicitud)
+);
+
+CREATE TABLE DETALLE_INGENIERO
+(
+    rutIngeniero VARCHAR(12),
+    idSolicitud INT,
+    FOREIGN KEY (rutIngeniero) REFERENCES INGENIERO(RUT),
+    FOREIGN KEY (idSolicitud) REFERENCES SOLICITUD(idSolicitud)
+);
+
+CREATE TABLE DETALLE_TOPICO
+(
+    idTopicoDetalle INT,
+    rutIngeniero VARCHAR(12),
+    FOREIGN KEY (idTopicoDetalle) REFERENCES TOPICO(idTopico),
+    FOREIGN KEY (rutIngeniero) REFERENCES INGENIERO(RUT)
+);
+
