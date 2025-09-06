@@ -1,2 +1,22 @@
 idSolicitud,idTopicoSolicitud,estado,titulo,ambiente,resumen
-0,1,Progreso,"Solicitud funcionalidad de prueba 12345678910",Web,"chavales que aqui vamos a estar haciendo pruebas"
+1,0,Abierto,Implementación de login,Web,"Se debe crear un sistema de inicio de sesdación de correo electrónico."
+2,1,Progreso,Mejoras en el rendimiento de la app,Movil,"Optimizar el tiempo de caro. Se implementarán técnicas de compresión de datos."
+3,2,Resuelto,Integración con redes sociales,Web,"Agregar botones de compartir en r interacción del usuario."
+4,0,Cerrado,Optimización del código,Web,"Realizar una revisión exhaustiva del códide algunas funciones y métodos."
+5,3,Abierto,Generación de reportes automáticos,Movil,"Crear un sistema que genere o electrónico a los administradores."
+6,1,Resuelto,Nuevas funcionalidades en el panel de admin,Web,"Se agregan nuevas opos más fácilmente."
+7,2,Cerrado,Mejoras en la interfaz de usuario,Movil,"Realizar un rediseño de la inble para todos."
+8,0,Abierto,Configuración avanzada de notificaciones,Movil,"Permitir que los usuarlas reciben."
+9,1,Progreso,Soporte para múltiples idiomas,Web,"Agregar soporte para al menos 5 iiseño para diferentes longitudes de texto."
+10,3,Resuelto,Mejoras en la seguridad del sistema,Web,"Fortalecer la seguridad dely la autenticación de usuarios."
+11,2,Abierto,Importación de datos de CSV,Movil,"Crear una funcionalidad que permits de la aplicación."
+12,0,Cerrado,Restauración de datos,Web,"Implementar una función de recuperación de,1,Abierto,Implementación de un chat en vivo,Movil,"Incorporar un sistema de chaesde la aplicación."
+14,2,Progreso,Rediseño de la pantalla de inicio,Web,"Revisar el diseño de la pantativos."
+15,3,Resuelto,Sincronización entre dispositivos,Web,"Permitir que los usuarios sinación."
+16,1,Cerrado,Control de acceso a la información,Movil,"Implementar un sistema de cnfidencial."
+17,2,Abierto,Verificación de datos,Web,"Crear una funcionalidad para validar los dato."
+18,0,Resuelto,Implementación de API REST,Movil,"Desarrollar una API REST que permión entre sistemas."
+19,3,Progreso,Creación de un sistema de puntos,Web,"Desarrollar un sistema de puntrecuente."
+20,1,Abierto,Interfaz de búsqueda avanzada,Movil,"Implementar una funcionalidad avos."
+
+

@@ -19,32 +19,21 @@ CREATE TABLE USUARIO
 CREATE TABLE TOPICO
 (
     idTopico INT PRIMARY KEY,
-    nomTopico VARCHAR(20) NOT NULL
+    nomTopico VARCHAR(20) NOT NULL --  Backend, Seguridad, UX/UI
 );
 
-CREATE TABLE SOLICITUD
-(
-    idSolicitud INT PRIMARY KEY,
+CREATE TABLE SOLICITUD (
+    idSolicitud SERIAL PRIMARY KEY,
     idTopicoSolicitud INT NOT NULL,
-    estado VARCHAR(10)
+    estado VARCHAR(10),         -- Abierto, En Progreso, Resuelto, Cerrado
+    tipo VARCHAR(20) NOT NULL,  -- "funcionalidad", "gestion_error"
+    titulo VARCHAR(64),         -- funcionalidad:[20:64]
+    ambiente VARCHAR(5),        -- Funcionabilidad : Web/Movil
+    resumen VARCHAR(150),       -- Funcionalidad
+    fechaPublicacion DATE,      -- Error
+    descripcion VARCHAR(200)    -- Error
 );
 
-CREATE TABLE FUNCIONALIDAD
-(
-    titulo VARCHAR(60) NOT NULL,
-    ambiente VARCHAR(5),
-    resumen VARCHAR(150) NOT NULL
-) INHERITS (SOLICITUD);
-
-CREATE TABLE GESTION_ERROR
-(
-    idSolicitud INT PRIMARY KEY,
-    idTopicoSolicitud INT NOT NULL,
-    estado VARCHAR(10),
-    titulo VARCHAR(60) NOT NULL,
-    fechaPublicacion DATE NOT NULL,
-    descripcion VARCHAR(200) NOT NULL
-);
 
 CREATE TABLE DETALLE_SOLICITUD
 (

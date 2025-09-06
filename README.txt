@@ -1,5 +1,11 @@
+Martin Aguayo Ogaz 202473099-1
 Tomás Rivadeneira 202373030-0
+Grupo_10
 
+## OJO ##
+> las consultas query se haran en la defensa de manera manual suando PGadmin
+> se entrega unos archivos csv con pocos datos debido a lo pesado que lelga ser guardar todo y debido que demora generar datos
+  consistentes, en el momento de la defesa se tendra los csv con los 600 solicitudees, 50 ingenieros, 50 usuarios
 
 # prerequisitos #
 
@@ -17,7 +23,7 @@ se uso postgreSQL, python3, pandas,
 2- dar a correr a main.py 
 
 # para cerrar la database #
-1-) abrir terminal
+1- abrir terminal
 > psql -U postgres
 2- verificar la BD 
 > \l (salir con q)
@@ -27,3 +33,4 @@ se uso postgreSQL, python3, pandas,
 > DROP DATABASE tarea1
 5- revisar
 > \l
+

@@ -1,2 +1,22 @@
 idSolicitud,idTopicoSolicitud,estado,titulo,fechaPublicacion,descripcion
-5,2,Abierto,"Tengo caca En mi pantalon",13-04-2023,"aqui hay una descripcion no nulla de nuevo "
+201,0,Abierto,Error en la carga de imagen del perfil,01-01-2015,"El sistema no permite cargar correc lo que impide la personalización del usuario."
+202,0,Progreso,Falta de validación en el formulario de registro,02-01-2015,"El formulario de registrs campos obligatorios, permitiendo enviar datos vacíos."
+203,0,Resuelto,Error al intentar hacer pagos internacionales,03-01-2015,"Los usuarios no pueden realera debido a un error en el sistema de conversión de divisas."
+204,0,Cerrado,Fallo en la conexión con el servidor,04-01-2015,"Se presenta un error al intentar conealizar consultas a la base de datos."
+205,0,Abierto,Problema en la sincronización de datos en tiempo real,05-01-2015,"Los datos de la aplirectamente entre dispositivos, lo que causa inconsistencias."
+206,0,Progreso,Error en la actualización de los detalles de la cuenta,06-01-2015,"Los usuarios no puón personal en la configuración de la cuenta debido a un fallo en el backend."
+207,0,Resuelto,Problema con la visualización de productos en pantalla pequeña,07/01/2015,"En disposi, algunos productos no se visualizan correctamente, causando malformaciones en la interfaz."
+208,0,Cerrado,Desbordamiento de memoria en la aplicación de Android,08-01-2015,"La aplicación en And de memoria al manejar grandes volúmenes de datos de usuario."
+209,0,Abierto,Error en la carga de los pedidos previos,09/01/2015,"Los pedidos anteriores no se muestalla de historial de compras de los usuarios."
+210,0,Progreso,Falla en la validación de contraseñas en la app,10-01-2015,"El sistema no valida corrermitiendo contraseñas débiles o demasiado cortas."
+211,0,Resuelto,Error en el cálculo de los descuentos aplicados,11-01-2015,"El sistema no aplica corrante el proceso de compra, mostrando un precio incorrecto."
+212,0,Cerrado,Desajuste en la cantidad de stock disponible,12-01-2015,"El stock de productos no se aue lleva a mostrar productos agotados como disponibles."
+213,0,Abierto,Problema con la carga de la página de checkout,13-01-2015,"La página de pago no se cardispositivos, lo que impide completar las compras."
+214,0,Progreso,Fallo en la autenticación de usuarios con Google,14-01-2015,"El sistema no autentica  que intentan iniciar sesión utilizando sus cuentas de Google."
+215,0,Resuelto,Error al recuperar la contraseña,15-01-2015,"Los usuarios no reciben el correo de recsar de haber solicitado el enlace."
+216,0,Cerrado,No se puede realizar la actualización de la app,16-01-2015,"La app no se actualiza cor, lo que impide que los usuarios obtengan las últimas características."
+217,0,Abierto,Error en la integración con el sistema de pago PayPal,1-01-2015,"La integración con Pae el proceso de pago, causando que las transacciones no se completen."
+218,0,Progreso,Falta de compatibilidad con versiones anteriores de iOS,18-01-2015,"La app no es comps de iOS, causando fallos en la experiencia de usuario."
+219,0,Resuelto,Incompatibilidad con algunos dispositivos Android,19-01-2015,"La app no es compatibles de Android, causando bloqueos frecuentes en el arranque."
+
+

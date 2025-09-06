@@ -86,7 +86,6 @@ def poblarDatos(conn):
                             row['email']
                         ))
 
-
         # poblar Ingenieros #
         for _, row in pandas.read_csv("csv/ingenieros.csv")[['RUT','nombre','email']].drop_duplicates().iterrows():
             cur.execute("""
@@ -109,69 +108,64 @@ def poblarDatos(conn):
                             row['nomTopico']
                         ))
 
-        # poblar sol_gestion_errore #
-        error_dv = pandas.read_csv("csv/errores.csv")[['idSolicitud', 'idTopicoSolicitud', 'estado', 'titulo', 'fechaPublicacion', 'descripcion']]
-        for _, row in pandas.read_csv("csv/errores.csv")[['idSolicitud', 'idTopicoSolicitud', 'estado', 'titulo', 'fechaPublicacion', 'descripcion']].drop_duplicates().iterrows():
+
+        ## poblar solicitud ##
+
+        ## poblar Gestion errores ##
+        errores_df = pandas.read_csv("csv/errores.csv")[[
+            'idSolicitud', 'idTopicoSolicitud', 'estado',
+            'titulo', 'fechaPublicacion', 'descripcion'
+        ]]
+
+        for _, row in errores_df.drop_duplicates().iterrows():
             try:
-                
                 fecha = parse(row['fechaPublicacion'], dayfirst=True).date()
-                #print("Valor idSolicitud crudo:", repr(row['idSolicitud']))
-                #print("→ Insertando en GESTION_ERROR...")
-                #print("→ Datos a insertar:", tuple(row))
-                #print("→ Tipo de fecha:", type(fecha))
-                ##print(cur.mogrify("""
-                ##    INSERT INTO gestion_error (idSolicitud,idTopicoSolicitud, estado, titulo,fechaPublicacion , descripcion)
-                ##    VALUES (%s, %s, %s, %s, %s, %s)
-                #""", (
-                #    int(row['idSolicitud']),
-                #    int(row['idTopicoSolicitud']),
-                #    row['estado'],
-                #    row['titulo'],
-                #    fecha,
-                #    row['descripcion']
-                #)).decode())
                 cur.execute("""
-                    INSERT INTO gestion_error (idSolicitud,idTopicoSolicitud, estado, titulo,fechaPublicacion, descripcion)
-                    VALUES (%s, %s, %s, %s, %s,%s)
+                    INSERT INTO SOLICITUD (
+                        idSolicitud, idTopicoSolicitud, estado, tipo,
+                        titulo, fechaPublicacion, descripcion
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, (
                     int(row['idSolicitud']),
                     int(row['idTopicoSolicitud']),
                     row['estado'],
+                    'gestion_error',
                     row['titulo'],
                     fecha,
                     row['descripcion']
                 ))
-                #print("→ Inserción exitosa")
             except Exception as e:
-                print(f"Error en la ejecución gestion errores: {e}")
-            
-        ####
-        # poblar sol_funcionalidades #
+                print(f"error insertando gestion_error: {e}")
 
-        funci = pandas.read_csv("csv/funcionalidad.csv")
-        # Filtrar títulos con al menos 20 caracteres
-        funci_filtrado = funci[funci['titulo'].str.len() >= 20]
+        ## poblar funcionalidad ##
+        funci_df = pandas.read_csv("csv/funcionalidad.csv")
 
-        # Insertar en la tabla FUNCIONALIDAD
+        # Filtrar por títulos válidos
+        funci_filtrado = funci_df[funci_df['titulo'].str.len() >= 20]
+
         for _, row in funci_filtrado.drop_duplicates().iterrows():
             try:
                 cur.execute("""
-                    INSERT INTO FUNCIONALIDAD (idSolicitud,idTopicoSolicitud, estado, titulo, ambiente, resumen)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    INSERT INTO SOLICITUD (
+                        idSolicitud, idTopicoSolicitud, estado, tipo,
+                        titulo, ambiente, resumen
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, (
                     int(row['idSolicitud']),
                     int(row['idTopicoSolicitud']),
                     row['estado'],
+                    'funcionalidad',
                     row['titulo'],
                     row['ambiente'],
                     row['resumen']
-                ))      
+                ))
             except Exception as e:
-                print(f"Error en la ejecución fucionalidad: {e}")
+                print(f"Error insertando funcionalidad: {e}")
+
 
         conn.rollback()
     except Exception as e:
-        print(f"Error en la ejecución general en seccion datos normales: {e}")
+        print(f"error en la ejecución general en seccion datos normales: {e}")
 
         
 
@@ -179,105 +173,25 @@ def poblarDetalles(conn):
     try:
         cur = conn.cursor()
 
-        ## tarea : asegurar borrar los duplicados, pero revisarlos por separado ##
         
         # Leer usuarios desde la tabla USUARIO
         usuarios_df = pandas.read_sql("SELECT RUT FROM USUARIO", engine)
 
-        ingenieros_df = pandas.read_csv("csv/ingenieros.csv")[['RUT','nombre','email']].drop_duplicates().iterrows()
+        ingenieros_df = pandas.read_csv("csv/ingenieros.csv")[['RUT','especialidad','nombre','email']].drop_duplicates().iterrows()
 
 
-        ## poblar detalle_solucion ##
-
-        ## funcionalidad ##
-
-        # Leer solicitudes válidas desde la tabla FUNCIONALIDAD
-        #funcionalidades_df = pandas.read_sql('SELECT idSolicitud, titulo FROM FUNCIONALIDAD', engine)
-        # Extraer IDs de solicitudes
-        try:
-            funcionalidades_df = pandas.read_sql('SELECT idSolicitud, titulo FROM FUNCIONALIDAD WHERE LENGTH(titulo) >= 20', engine)
-            print(funcionalidades_df.head())
-            print(funcionalidades_df.columns)
-
-            solicitudes_disponibles_funci = funcionalidades_df['idsolicitud'].tolist()
-            solicitud_index = 0
-            total_solicitudes_funci = len(solicitudes_disponibles_funci)
-
-        except Exception as e:
-            print(f"Error en extraer info funci: {e}")
-
-        # Insertar relaciones en DETALLE_SOLICITUD
-
-        for _, usuario in usuarios_df.iterrows():
-            try:
-                rut = str(usuario['rut']).strip()
-                cur = conn.cursor()
-
-                for _ in range(25):
-                    if solicitud_index >= total_solicitudes_funci:
-                        print("⚠️ No hay suficientes solicitudes para todos los usuarios.")
-                        break
-
-                    id_sol = solicitudes_disponibles_funci[solicitud_index]
-                    solicitud_index += 1
-
-                    try:
-                        cur.execute("""
-                            INSERT INTO DETALLE_SOLICITUD (rutusuario, idSolicitud)
-                            VALUES (%s, %s)
-                        """, (rut, id_sol))
-                    except Exception as e:
-                        print(f"❌ Error insertando ({rut}, {id_sol}): {e}")
-            except Exception as e:
-                print(f"Error poblar detalle_solicitud: {e}")
-
-        
-        ## poblar detalle_solicitud - gestion_error ##
-
-        errores_df = pandas.read_sql("""
-            SELECT idSolicitud, titulo
-            FROM GESTION_ERROR
-            WHERE LENGTH(titulo) >= 20
-        """, conn)
-        # Extraer IDs de solicitudes
-        solicitudes_disponibles_gerror = errores_df['idSolicitud'].tolist()
-        solicitud_index = 0
-        total_solicitudes_gerror = len(solicitudes_disponibles_gerror)
-
-        # Insertar relaciones en DETALLE_SOLICITUD
-        for _, usuario in usuarios_df.iterrows():
-            rut = str(usuario['rut']).strip()
-            cur = conn.cursor()
-
-            for _ in range(25):
-                if solicitud_index >= total_solicitudes_gerror:
-                    print("⚠️ No hay suficientes solicitudes para todos los usuarios.")
-                    break
-
-                id_sol = solicitudes_disponibles_gerror[solicitud_index]
-                solicitud_index += 1
-
-                try:
-                    cur.execute("""
-                        INSERT INTO DETALLE_SOLICITUD (rutusuario, idsolicitud)
-                        VALUES (%s, %s)
-                    """, (rut, id_sol))
-                except Exception as e:
-                    print(f"❌ Error insertando ({rut}, {id_sol}): {e}")
-        
         ## Poblar detalle_topicos ##
         ## se asegura que hayan solo 3 ingenieros con un topico ##
-
-        asignaciones_topico = {}
-        for _,row in ingenieros_df:
-            
-            especialidades = row['especialidad'].strip().split(";")
-            
-            for topico_id in especialidades:
-                topico_id = int(topico_id.strip())
+        try:
+            asignaciones_topico = {}
+            for _,row in ingenieros_df:
                 
-                # Verificar si el tópico ya tiene 3 ingenieros
-                if asignaciones_topico.get(topico_id, 0) < 3:
+                especialidades = row['especialidad'].strip().split(";")
+                rut = row['RUT']
+
+                for topico_id in especialidades:
+                    topico_id = int(topico_id.strip())
+                    
                     try:
                         cur.execute("""
                             INSERT INTO DETALLE_TOPICO (idTopicoDetalle, rutINGENIERO)
@@ -286,65 +200,126 @@ def poblarDetalles(conn):
                         asignaciones_topico[topico_id] = asignaciones_topico.get(topico_id, 0) + 1
                     except Exception as e:
                         print(f" Error insertando DETALLE_TOPICO ({topico_id}, {rut}): {e}")
-                else:
-                    print(f" Tópico {topico_id} ya tiene 3 ingenieros. No se asignó a {rut}.")
+        except Exception as e:
+                print(f"Error poblar Detalle_Topico {e}")
 
 
         ## poblar detalle_ingeniero ##
         ## asegura que hayan tres ingenieros por solicitud ##
         ## max 20 solicitudes por ing ##
+        try:
+            # 1. Obtener las especialidades de ingenieros
+            cur.execute("""
+                SELECT idTopicoDetalle, rutINGENIERO
+                FROM DETALLE_TOPICO
+            """)
+            rows = cur.fetchall()
 
-        # 1. Obtener las especialidades de ingenieros
-        cur.execute("""
-            SELECT idTopicoDetalle, rutINGENIERO
-            FROM DETALLE_TOPICO
-        """)
-        rows = cur.fetchall()
+            # Mapa: topico → [ingenieros especializados]
+            ingenieros_por_topico = defaultdict(list)
+            asignaciones_por_ingeniero = defaultdict(int)
 
-        # Mapa: topico → [ingenieros especializados]
-        ingenieros_por_topico = defaultdict(list)
-        asignaciones_por_ingeniero = defaultdict(int)
+            for id_topico, rut in rows:
+                ingenieros_por_topico[id_topico].append(rut)
 
-        for id_topico, rut in rows:
-            ingenieros_por_topico[id_topico].append(rut)
+            # 2. Obtener todas las solicitudes (heredadas) con idTopicoSolicitud
+            cur.execute("""
+                SELECT idSolicitud, idTopicoSolicitud FROM SOLICITUD
+                WHERE idTopicoSolicitud IS NOT NULL
+            """)
+            solicitudes = cur.fetchall()
 
-        # 2. Obtener todas las solicitudes (heredadas) con idTopicoSolicitud
-        cur.execute("""
-            SELECT idSolicitud, idTopicoSolicitud FROM SOLICITUD
-            WHERE idTopicoSolicitud IS NOT NULL
-        """)
-        solicitudes = cur.fetchall()
+            # 3. Asignar 3 ingenieros por solicitud
+            inserts = []
 
-        # 3. Asignar 3 ingenieros por solicitud
-        inserts = []
+            for idSolicitud, idTopico in solicitudes:
+                posibles_ingenieros = [
+                    rut for rut in ingenieros_por_topico.get(idTopico, [])
+                    if asignaciones_por_ingeniero[rut] < 20
+                ]
 
-        for idSolicitud, idTopico in solicitudes:
-            posibles_ingenieros = [
-                rut for rut in ingenieros_por_topico.get(idTopico, [])
-                if asignaciones_por_ingeniero[rut] < 20
-            ]
+                if len(posibles_ingenieros) < 3:
+                    print(f"No hay suficientes ingenieros especializados en tópico {idTopico} para solicitud {idSolicitud}.")
+                    continue
 
-            if len(posibles_ingenieros) < 3:
-                print(f"⛔ No hay suficientes ingenieros especializados en tópico {idTopico} para solicitud {idSolicitud}.")
-                continue
+                seleccionados = random.sample(posibles_ingenieros, 3)
 
-            seleccionados = random.sample(posibles_ingenieros, 3)
+                for rut in seleccionados:
+                    asignaciones_por_ingeniero[rut] += 1
+                    inserts.append((rut, idSolicitud))
 
-            for rut in seleccionados:
-                asignaciones_por_ingeniero[rut] += 1
-                inserts.append((rut, idSolicitud))
+            # 4. Insertar en DETALLE_INGENIERO
+            for rut, idSolicitud in inserts:
+                try:
+                    cur.execute("""
+                        INSERT INTO DETALLE_INGENIERO (rutINGENIERO, idSolicitud)
+                        VALUES (%s, %s)
+                    """, (rut, idSolicitud))
+                except Exception as e:
+                    print(f"Error insertando ({rut}, {idSolicitud}): {e}")
 
-        # 4. Insertar en DETALLE_INGENIERO
-        for rut, idSolicitud in inserts:
+        except Exception as e:
+                print(f"Error zona detalle_ingeniero: {e}")
+        
+        ## Poblar Detalle Solicitud ##
+        try:
+            cur.execute("SELECT RUT FROM USUARIO")
+            usuarios = [row[0] for row in cur.fetchall()]
+
+            # 3. Crear un diccionario para contar las solicitudes asignadas por usuario y tipo
+            solicitudes_asignadas = {usuario: {'gestion_error': 0, 'funcionalidad': 0} for usuario in usuarios}
+
+            # 4. Preparar una lista para insertar en DETALLE_SOLICITUD
+            insert_values = []
+
+            # 5. Asignar solicitudes a usuarios
+            cur.execute("""
+                SELECT idSolicitud, tipo 
+                FROM SOLICITUD
+                WHERE tipo IN ('gestion_error', 'funcionalidad')
+            """)
+            solicitudes = cur.fetchall()
             try:
-                cur.execute("""
-                    INSERT INTO DETALLE_INGENIERO (rutINGENIERO, idSolicitud)
-                    VALUES (%s, %s)
-                """, (rut, idSolicitud))
+                for id_solicitud, tipo in solicitudes:
+                    # Intentamos asignar una solicitud a un usuario que no haya superado el límite
+                    try:
+                        for usuario in usuarios:
+                            if solicitudes_asignadas[usuario][tipo] < 25:
+                                # Asignamos la solicitud al usuario
+                                insert_values.append((usuario, id_solicitud))
+                                solicitudes_asignadas[usuario][tipo] += 1
+                                break  # Salimos del ciclo una vez que hemos asignado la solicitud a un usuario
+                    except Exception as e:
+                        print(f"Error analizando solicitudes : {e}")
             except Exception as e:
-                print(f"❌ Error insertando ({rut}, {idSolicitud}): {e}")
+                 print(f"Error solicitudes usuarios: {e}")
+
+            # 6. Insertar las relaciones en DETALLE_SOLICITUD
+
+            try:
+                if insert_values:
+                    cur.executemany("""
+                        INSERT INTO DETALLE_SOLICITUD (rutUsuario, idSolicitud)
+                        VALUES (%s, %s)
+                    """, insert_values)
+
+                    conn.commit()
+                    print(f"Se han insertado {len(insert_values)} relaciones en DETALLE_SOLICITUD.")
+
+                else:
+                    print("No se insertaron relaciones en DETALLE_SOLICITUD.") 
+            except Exception as e:
+                print(f"Error en inserción detalle_solicitud: {e}")
+
+        except Exception as e:
+                print(f"Error zona detalle_solicitudes: {e}")
+
+        ## poblar detalle_solucion ##
+
+
+
     except Exception as e:
-        print(f"Error en la ejecución general: {e}")
+        print(f"Error en la ejecución general seccion detalles: {e}")
 
     
 def main():
